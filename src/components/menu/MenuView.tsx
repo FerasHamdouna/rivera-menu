@@ -95,7 +95,6 @@ export function MenuView({ sections, settings, logoUrl, icons }: Props) {
   const [term, setTerm] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
   const [lifted, setLifted] = useState<string | null>(null);
-  const paperRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const t = STRINGS[lang];
 
@@ -154,22 +153,6 @@ export function MenuView({ sections, settings, logoUrl, icons }: Props) {
     return () => io.disconnect();
   }, [filtered, view]);
 
-  // Paper tilts with the mouse, or with the phone's gyroscope.
-  useEffect(() => {
-    const paper = paperRef.current;
-    if (!paper || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const tilt = (x: number, y: number) => {
-      paper.style.setProperty('--ty', `${x * 4}deg`); paper.style.setProperty('--tx', `${-y * 3}deg`);
-      paper.style.setProperty('--gx', `${50 + x * 50}%`); paper.style.setProperty('--gy', `${20 + y * 40}%`);
-    };
-    const onMove = (e: PointerEvent) => e.pointerType === 'mouse' && tilt(e.clientX / innerWidth - 0.5, e.clientY / innerHeight - 0.5);
-    const clamp = (v: number) => Math.max(-1, Math.min(1, v)) / 2;
-    const onTilt = (e: DeviceOrientationEvent) => e.gamma != null && e.beta != null && tilt(clamp(e.gamma / 30), clamp((e.beta - 45) / 30));
-    addEventListener('pointermove', onMove);
-    addEventListener('deviceorientation', onTilt);
-    return () => { removeEventListener('pointermove', onMove); removeEventListener('deviceorientation', onTilt); };
-  }, []);
-
   const openItem = (id: string) => {
     setLifted(id);
     setTimeout(() => { setLifted(null); setOpenId(id); }, 220);
@@ -189,7 +172,7 @@ export function MenuView({ sections, settings, logoUrl, icons }: Props) {
   return (
     <div className="rv" ref={rootRef} lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="rv-desk">
-        <article className="rv-paper" ref={paperRef}>
+        <article className="rv-paper">
           <Frame />
           <header className="rv-brand"><Logo src={logoUrl} /></header>
 
