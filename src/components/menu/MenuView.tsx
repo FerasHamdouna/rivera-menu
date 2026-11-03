@@ -1,7 +1,8 @@
 'use client';
 
 import { Clock, LayoutGrid, MapPin, MessageCircle, Phone, ScrollText, Search, X, Link as LinkIcon } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { flushSync } from 'react-dom';
 import type { MenuItem, MenuSection, Settings } from '@/lib/types';
 import { Frame, Logo } from './ornaments';
@@ -18,6 +19,7 @@ type Props = {
   icons: Record<string, ReactNode>;
 };
 
+const ADMIN_HOLD_MS = 5000;
 const LANG_KEY = 'rivera.lang';
 const VIEW_KEY = 'rivera.view';
 const store = {
@@ -153,6 +155,22 @@ export function MenuView({ sections, settings, logoUrl, icons }: Props) {
     return () => io.disconnect();
   }, [filtered, view]);
 
+  // Hidden way into the admin: hold the logo for 5 seconds. Lifting or moving the finger cancels it.
+  // (Security comes from the login itself; this only keeps the entrance out of customers' sight.)
+  const router = useRouter();
+  const holdRef = useRef<{ timer: number; x: number; y: number } | null>(null);
+  const cancelHold = () => { if (holdRef.current) clearTimeout(holdRef.current.timer); holdRef.current = null; };
+  const startHold = (e: PointerEvent<HTMLElement>) => {
+    cancelHold();
+    const timer = window.setTimeout(() => { holdRef.current = null; navigator.vibrate?.(30); router.push('/admin'); }, ADMIN_HOLD_MS);
+    holdRef.current = { timer, x: e.clientX, y: e.clientY };
+  };
+  const moveHold = (e: PointerEvent<HTMLElement>) => {
+    const h = holdRef.current;
+    if (h && Math.hypot(e.clientX - h.x, e.clientY - h.y) > 12) cancelHold();
+  };
+  useEffect(() => cancelHold, []);
+
   const openItem = (id: string) => {
     setLifted(id);
     setTimeout(() => { setLifted(null); setOpenId(id); }, 220);
@@ -174,7 +192,17 @@ export function MenuView({ sections, settings, logoUrl, icons }: Props) {
       <div className="rv-desk">
         <article className="rv-paper">
           <Frame />
-          <header className="rv-brand"><Logo src={logoUrl} /></header>
+          <header
+            className="rv-brand"
+            onPointerDown={startHold}
+            onPointerMove={moveHold}
+            onPointerUp={cancelHold}
+            onPointerLeave={cancelHold}
+            onPointerCancel={cancelHold}
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            <Logo src={logoUrl} />
+          </header>
 
           <div className="rv-tools">
             <label className="rv-search">
