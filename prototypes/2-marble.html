@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rivera · Marble &amp; Gold</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/brand.css">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="shared/data.js"></script>
+<script src="shared/brand.js"></script>
+<style>
+  body { background-attachment: fixed; }
+  .spot { position: fixed; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 30%), rgba(201,154,107,.10), transparent 70%); }
+  .branch { position: fixed; z-index: 0; color: var(--gold); opacity: .35; pointer-events: none; will-change: transform; }
+  .branch.b1 { top: 10vh; left: -40px; width: 180px; }
+  .branch.b2 { top: 55vh; right: -50px; width: 200px; transform: scaleX(-1); }
+
+  /* Hero */
+  .hero { position: relative; height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow: hidden; z-index: 2; }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero .logo { transform: scale(1.35); animation: drop 1.4s cubic-bezier(.2,.9,.2,1) both; }
+  .hero .menu { direction: ltr; font-family: 'Cinzel', serif; font-size: clamp(64px, 18vw, 120px); letter-spacing: .08em; margin-top: 40px; line-height: 1; }
+  .hero .menu span { display: inline-block; animation: letter 1.2s cubic-bezier(.2,.9,.2,1) both; }
+  .hero .tag { font-family: 'Amiri', serif; font-size: 22px; color: var(--gold-hi); margin-top: 14px; animation: fade 1s 1.4s both; }
+  .hero .tag b { display: block; font-size: 46px; }
+  .cue { position: absolute; bottom: 28px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; letter-spacing: .2em; animation: fade 1s 2s both; }
+  .cue::after { content: ''; width: 1px; height: 46px; background: linear-gradient(var(--gold), transparent); animation: drip 2s ease-in-out infinite; transform-origin: top; }
+  @keyframes drop { from { opacity: 0; transform: translateY(-40px) scale(1.6); filter: blur(8px); } }
+  @keyframes letter { from { opacity: 0; transform: translateY(60%) rotateX(80deg); filter: blur(6px); } }
+  @keyframes fade { from { opacity: 0; transform: translateY(12px); } }
+  @keyframes drip { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+  /* Sticky section nav */
+  .nav { position: sticky; top: 0; z-index: 30; background: rgba(15,13,12,.82); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(201,154,107,.25); }
+  .nav .track { position: relative; display: flex; gap: 4px; overflow-x: auto; padding: 10px 12px; scrollbar-width: none; }
+  .nav button { position: relative; z-index: 1; flex: none; display: flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 99px; color: var(--muted); font-size: 14px; transition: color .3s; white-space: nowrap; }
+  .nav button svg { width: 17px; }
+  .nav button.on { color: var(--ink); font-weight: 700; }
+  .nav .ink { position: absolute; top: 10px; height: calc(100% - 20px); border-radius: 99px; background: var(--gold-grad); background-size: 200% 100%; transition: all .45s cubic-bezier(.3,.9,.3,1); box-shadow: 0 6px 18px rgba(201,154,107,.35); }
+
+  main { position: relative; z-index: 2; max-width: 980px; margin: 0 auto; padding: 0 16px 80px; }
+  section { padding-top: 70px; scroll-margin-top: 50px; }
+  .head { text-align: center; margin-bottom: 26px; }
+  .head .ring { width: 92px; height: 92px; margin: 0 auto 14px; border-radius: 50%; display: grid; place-items: center; color: var(--gold-hi); position: relative; }
+  .head .ring::before { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--gold); transform: scale(.4); opacity: 0; transition: all 1s cubic-bezier(.2,.9,.2,1); }
+  .head .ring::after { content: ''; position: absolute; inset: -10px; border-radius: 50%; border: 1px dashed rgba(201,154,107,.4); animation: spin 24s linear infinite; }
+  .head .ring svg { width: 40px; height: 40px; stroke-width: 1; stroke-dasharray: 160; stroke-dashoffset: 160; transition: stroke-dashoffset 1.8s .3s ease; }
+  .head h2 { font-family: 'Amiri', serif; font-size: 40px; line-height: 1.2; }
+  [lang=en] .head h2 { font-family: 'Cinzel', serif; font-size: 32px; }
+  .head .sub { font-family: 'Cinzel', serif; letter-spacing: .35em; font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .head .line { height: 1px; width: 0; margin: 16px auto 0; background: linear-gradient(90deg, transparent, var(--gold), transparent); transition: width 1.2s .4s ease; }
+  section.in .head .ring::before { transform: none; opacity: 1; }
+  section.in .head .ring svg { stroke-dashoffset: 0; }
+  section.in .head .line { width: 220px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  @media (min-width: 720px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  .card {
+    position: relative; border-radius: 18px; overflow: hidden; cursor: pointer; text-align: start;
+    background: linear-gradient(160deg, #241e1a, #16120f); border: 1px solid rgba(201,154,107,.22);
+    opacity: 0; transform: translateY(40px) scale(.96); filter: blur(4px);
+    transition: opacity .8s, transform .8s cubic-bezier(.2,.9,.2,1), filter .8s, border-color .3s, box-shadow .3s;
+    transition-delay: var(--d, 0s);
+  }
+  section.in .card { opacity: 1; transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); filter: none; }
+  .card:hover { border-color: var(--gold); box-shadow: 0 18px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(201,154,107,.3); }
+  .card .art { aspect-ratio: 1 / .82; }
+  .card.feat { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
+  .card.feat .art { aspect-ratio: auto; min-height: 190px; }
+  .card.feat .info { display: flex; flex-direction: column; justify-content: center; }
+  .card.feat .nm { font-size: 24px; }
+  .card .info { padding: 12px 14px 14px; }
+  .card .nm { font-weight: 700; font-size: 17px; }
+  .card .en { color: var(--muted); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; }
+  .card .pr { margin-top: 8px; font-family: 'Cinzel', serif; font-weight: 700; font-size: 18px; display: flex; align-items: baseline; gap: 4px; }
+  .card .pr small { font-size: 12px; color: var(--gold); }
+  .card .badge-out { position: absolute; top: 10px; inset-inline-start: 10px; z-index: 2; }
+  .card .feat-tag { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: .3em; color: var(--gold); margin-bottom: 6px; }
+  /* Foil sheen sweep */
+  .card::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 35%, rgba(240,207,166,.22) 50%, transparent 65%); transform: translateX(-120%); }
+  .card:hover::after, section.in .card.feat::after { animation: sheen 1.4s ease forwards; }
+  @keyframes sheen { to { transform: translateX(120%); } }
+
+  .lang { top: auto; bottom: 18px; }
+  footer { text-align: center; padding: 60px 16px 90px; position: relative; z-index: 2; }
+  footer .logo { transform: scale(.9); }
+</style>
+</head>
+<body class="marble">
+  <div class="spot"></div>
+  <svg class="branch b1" id="b1" viewBox="0 0 120 300"></svg>
+  <svg class="branch b2" id="b2" viewBox="0 0 120 300"></svg>
+  <header class="hero" id="hero"><canvas id="dust"></canvas><div id="heroIn" style="position:relative"></div></header>
+  <nav class="nav"><div class="track" id="nav"></div></nav>
+  <main id="main"></main>
+  <footer><div id="foot"></div></footer>
+<script>
+const R = RIVERA, main = document.getElementById('main'), nav = document.getElementById('nav');
+
+// Decorative leafy branch like the printed cover.
+function branch(svg) {
+  let d = '<path d="M60 300 C55 220 70 150 58 0" stroke="currentColor" fill="none" stroke-width="1.2"/>';
+  for (let y = 270, k = 0; y > 20; y -= 26, k++) {
+    const side = k % 2 ? 1 : -1, x = 60 + Math.sin(y / 40) * 4;
+    d += `<path d="M${x} ${y} q${side * 30} -6 ${side * 46} -30 q${-side * 34} 2 ${-side * 46} 30z" fill="currentColor" opacity="${.35 + (k % 3) * .2}"/>`;
+  }
+  svg.innerHTML = d;
+}
+branch(b1); branch(b2);
+
+function render() {
+  heroIn.innerHTML = `${R.logo()}
+    <div class="menu">${'MENU'.split('').map((c, i) => `<span class="gold-text" style="animation-delay:${.6 + i * .12}s">${c}</span>`).join('')}</div>
+    <div class="tag">لحظاتك تستحق <b class="gold-text">التميز</b></div>`;
+  if (!hero.querySelector('.cue')) hero.insertAdjacentHTML('beforeend', '<div class="cue"></div>');
+  hero.querySelector('.cue').textContent = R.s('menu').toUpperCase();
+
+  nav.innerHTML = '<span class="ink"></span>' + R.sections.map((s) => `<button data-id="${s.id}"><i data-lucide="${s.icon}"></i>${R.t(s)}</button>`).join('');
+  main.innerHTML = R.sections.map((sec) => `
+    <section id="${sec.id}">
+      <div class="head">
+        <div class="ring"><i data-lucide="${sec.icon}"></i></div>
+        <h2 class="gold-text">${R.t(sec)}</h2>
+        <div class="sub">${sec.en.toUpperCase()} · ${sec.items.length} ${R.s('items')}</div>
+        <div class="line"></div>
+      </div>
+      <div class="grid">${sec.items.map((it, i) => `
+        <button class="card ${i === 0 ? 'feat' : ''} ${R.isOut(it) ? 'is-out' : ''}" data-s="${sec.id}" data-i="${i}" style="--d:${i * .07}s">
+          ${R.isOut(it) ? `<span class="badge-out">${R.s('out')}</span>` : ''}
+          ${R.art(sec, it, i)}
+          <div class="info">
+            ${i === 0 ? `<div class="feat-tag">${R.lang === 'ar' ? '✦ المميّز' : '✦ SIGNATURE'}</div>` : ''}
+            <div class="nm">${R.t(it)}</div>
+            <div class="en">${R.lang === 'ar' ? it.en : it.ar}</div>
+            <div class="pr"><span class="gold-text">${R.price(it)}</span>${it.price != null && !it.sizes ? '<small>₪</small>' : ''}</div>
+          </div>
+        </button>`).join('')}
+      </div>
+    </section>`).join('');
+  foot.innerHTML = `${R.logo()}<div class="divider" style="margin-top:20px">${R.fleuron}</div>`;
+  R.icons();
+  observe();
+  setActive(R.sections[0].id);
+}
+
+let io;
+function observe() {
+  io && io.disconnect();
+  io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add('in')), { threshold: .12 });
+  main.querySelectorAll('section').forEach((s) => io.observe(s));
+}
+function setActive(id) {
+  const b = nav.querySelector(`[data-id="${id}"]`), ink = nav.querySelector('.ink');
+  if (!b || b.classList.contains('on')) return;
+  nav.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+  ink.style.left = b.offsetLeft + 'px'; ink.style.width = b.offsetWidth + 'px';
+  b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+}
+
+nav.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) document.getElementById(b.dataset.id).scrollIntoView({ behavior: 'smooth' }); });
+main.addEventListener('click', (e) => {
+  const c = e.target.closest('.card'); if (!c) return;
+  const sec = R.sections.find((s) => s.id === c.dataset.s);
+  R.openSheet(sec, sec.items[c.dataset.i], +c.dataset.i);
+});
+// 3D tilt toward the pointer
+main.addEventListener('pointermove', (e) => {
+  const c = e.target.closest('.card'); if (!c || e.pointerType !== 'mouse') return;
+  const r = c.getBoundingClientRect();
+  c.style.setProperty('--ry', ((e.clientX - r.left) / r.width - .5) * 10 + 'deg');
+  c.style.setProperty('--rx', -((e.clientY - r.top) / r.height - .5) * 10 + 'deg');
+  c.style.transitionDelay = '0s';
+});
+main.addEventListener('pointerout', (e) => { const c = e.target.closest('.card'); if (c) { c.style.setProperty('--ry', '0deg'); c.style.setProperty('--rx', '0deg'); } });
+window.addEventListener('pointermove', (e) => { document.body.style.setProperty('--mx', e.clientX + 'px'); document.body.style.setProperty('--my', e.clientY + 'px'); });
+
+// Scroll: active section + parallax branches
+window.addEventListener('scroll', () => {
+  const y = scrollY;
+  b1.style.transform = `translateY(${-y * .15}px) rotate(${y * .01}deg)`;
+  b2.style.transform = `scaleX(-1) translateY(${-y * .3}px) rotate(${-y * .01}deg)`;
+  let cur = R.sections[0].id;
+  main.querySelectorAll('section').forEach((s) => { if (s.getBoundingClientRect().top < innerHeight * .35) cur = s.id; });
+  setActive(cur);
+}, { passive: true });
+
+// Gold dust drifting in the hero
+(function dust() {
+  const cv = document.getElementById('dust'), cx = cv.getContext('2d');
+  let w, h, ps = [];
+  const size = () => { w = cv.width = cv.offsetWidth * devicePixelRatio; h = cv.height = cv.offsetHeight * devicePixelRatio; };
+  size(); addEventListener('resize', size);
+  for (let i = 0; i < 70; i++) ps.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.8 + .4, v: Math.random() * .0006 + .0002, p: Math.random() * 6 });
+  (function tick(t) {
+    cx.clearRect(0, 0, w, h);
+    ps.forEach((p) => {
+      p.y += p.v; if (p.y > 1.02) { p.y = -.02; p.x = Math.random(); }
+      const a = .35 + .35 * Math.sin(t / 700 + p.p);
+      cx.beginPath();
+      cx.arc((p.x + Math.sin(t / 3000 + p.p) * .01) * w, p.y * h, p.r * devicePixelRatio, 0, 7);
+      cx.fillStyle = `rgba(240,207,166,${a})`; cx.fill();
+    });
+    requestAnimationFrame(tick);
+  })(0);
+})();
+
+R.mountLang(render);
+render();
+</script>
+</body>
+</html>

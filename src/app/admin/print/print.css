@@ -1,0 +1,66 @@
+/* A4 printed menu in the "Living Paper" style. On screen it previews as a sheet; in print it fills the page. */
+.pm {
+  --gold: #c99a6b;
+  --gold-lo: #8a5b38;
+  --gold-hi: #f0cfa6;
+  --ink: #2a211c;
+  --cream: #f7f0ea;
+  --gold-grad: linear-gradient(100deg, #6e4529 0%, #a8744c 28%, #d2a57a 48%, #a8744c 68%, #6e4529 100%);
+  color: var(--ink);
+  font-family: var(--font-tajawal), sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.pm-desk { background: #2a2421; padding: 24px 12px 60px; overflow-x: auto; }
+.pm-page {
+  position: relative; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 11mm 11mm 9mm;
+  background: radial-gradient(120% 90% at 50% 0%, #fbf6f2 0%, #efe2dd 100%);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  display: flex; flex-direction: column;
+}
+
+.pm-frame { position: absolute; inset: 6mm; border: .3mm solid color-mix(in srgb, var(--gold) 70%, transparent); pointer-events: none; }
+.pm-frame svg { position: absolute; width: 9mm; height: 9mm; color: var(--gold); }
+.pm-frame svg:nth-child(1) { top: -1.6mm; left: -1.6mm; }
+.pm-frame svg:nth-child(2) { top: -1.6mm; right: -1.6mm; transform: scaleX(-1); }
+.pm-frame svg:nth-child(3) { bottom: -1.6mm; left: -1.6mm; transform: scaleY(-1); }
+.pm-frame svg:nth-child(4) { bottom: -1.6mm; right: -1.6mm; transform: scale(-1); }
+
+.pm-gold { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.pm-head { text-align: center; margin-bottom: 2mm; }
+.pm-head .crown { width: 12mm; height: 8mm; color: var(--gold); margin: 0 auto -2.5mm; display: block; transform: translateX(10mm) rotate(12deg); }
+.pm-head .word { font-family: var(--font-vibes), cursive; font-size: 40px; line-height: 1; }
+.pm-head .sub { font-family: var(--font-cormorant), serif; font-size: 11px; letter-spacing: .2em; }
+.pm-head img { max-height: 22mm; max-width: 70mm; object-fit: contain; }
+
+.pm-cols { columns: 2; column-gap: 7mm; margin-bottom: 3mm; }
+.pm-blk { break-inside: avoid; position: relative; border: .3mm solid color-mix(in srgb, var(--gold) 75%, transparent); border-radius: 4mm; padding: 5mm 3.5mm 1.5mm; margin: 4.5mm 0 1mm; }
+.pm-pill { position: absolute; top: -4mm; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 2mm; white-space: nowrap;
+  background: #2a2320; color: var(--gold-hi); padding: 1.2mm 5mm; border-radius: 2.5mm; font-family: var(--font-amiri), serif; font-weight: 700; font-size: 15px;
+  box-shadow: 0 0 0 .3mm var(--gold), 0 0 0 1.1mm #f5ece7; }
+.pm-pill svg { width: 4mm; height: 4mm; }
+.pm-row { display: flex; align-items: baseline; gap: 2mm; padding: .55mm 0; break-inside: avoid; }
+.pm-row .nm { font-weight: 700; font-size: 12.5px; line-height: 1.3; }
+.pm-row .nm small { margin-inline-start: 1.5mm; font-weight: 400; font-size: 9.5px; color: #8b766a; font-family: var(--font-cormorant), serif; font-style: italic; }
+.pm-row .note { display: block; font-weight: 400; font-size: 9.5px; color: #8b766a; }
+.pm-row .dots { flex: 1; border-bottom: .35mm dotted #c2a691; min-width: 4mm; }
+.pm-row .pr { font-family: var(--font-cinzel), serif; font-weight: 700; font-size: 12px; color: var(--gold-lo); white-space: nowrap; }
+.pm-sizes { display: inline-flex; gap: 2.5mm; }
+.pm-sizes .sz { unicode-bidi: isolate; white-space: nowrap; }
+.pm-sizes .sz + .sz { border-inline-start: .3mm solid color-mix(in srgb, var(--gold) 60%, transparent); padding-inline-start: 2.5mm; }
+.pm-sizes .sn { font-family: var(--font-tajawal), sans-serif; font-weight: 500; font-size: 10px; color: #8b766a; margin-inline-end: 1mm; }
+.pm-row .pr .ask { font-family: var(--font-tajawal), sans-serif; font-weight: 500; font-size: 11px; }
+
+.pm-foot { display: flex; align-items: center; justify-content: space-between; gap: 6mm; margin-top: auto; padding-top: 3mm; border-top: .3mm solid color-mix(in srgb, var(--gold) 50%, transparent); font-size: 11px; color: #6b5548; }
+.pm-foot .info { display: grid; gap: 1mm; }
+.pm-foot .qr { display: flex; align-items: center; gap: 3mm; direction: ltr; }
+.pm-foot .qr svg { width: 20mm; height: 20mm; border-radius: 2mm; outline: .3mm solid var(--gold); }
+.pm-foot .qr span { font-family: var(--font-cinzel), serif; font-size: 9px; letter-spacing: .12em; color: var(--gold-lo); max-width: 30mm; line-height: 1.5; }
+
+@page { size: A4; margin: 0; }
+@media print {
+  html, body { background: #fff !important; }
+  .no-print { display: none !important; }
+  .pm-desk { background: none; padding: 0; }
+  .pm-page { box-shadow: none; margin: 0; }
+}

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rivera · Card Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/brand.css">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="shared/data.js"></script>
+<script src="shared/brand.js"></script>
+<style>
+  html { overflow: hidden; }
+  body { height: 100svh; overflow: hidden; display: flex; flex-direction: column; }
+  .glow { position: fixed; inset: 0; pointer-events: none; transition: background 1s; background: radial-gradient(60% 45% at 50% 52%, hsl(var(--h, 28) 45% 35% / .45), transparent 70%); }
+  header { position: relative; z-index: 2; text-align: center; padding: 14px 0 0; }
+  header .logo { transform: scale(.62); margin: -14px 0 -18px; }
+  .chips { position: relative; z-index: 2; display: flex; gap: 8px; overflow-x: auto; padding: 14px 16px 6px; scrollbar-width: none; }
+  .chips button { flex: none; display: flex; flex-direction: column; align-items: center; gap: 5px; width: 74px; padding: 10px 4px 8px; border-radius: 16px; color: var(--muted); font-size: 12px; border: 1px solid rgba(201,154,107,.2); transition: all .35s; }
+  .chips button svg { width: 22px; height: 22px; stroke-width: 1.4; }
+  .chips button.on { color: var(--gold-hi); border-color: var(--gold); background: rgba(201,154,107,.12); transform: translateY(-2px); }
+
+  .stage { position: relative; z-index: 2; flex: 1; overflow: hidden; perspective: 1200px; display: grid; place-items: center; touch-action: pan-y; user-select: none; }
+  .card { --x: 0; --z: 0; --r: 0deg; position: absolute; width: min(68vw, 300px); aspect-ratio: 3 / 4.3; transform-style: preserve-3d;
+    transform: translateX(var(--x)) translateZ(var(--z)) rotateY(var(--r)) rotateY(var(--flip, 0deg));
+    transition: transform .7s cubic-bezier(.25,.9,.25,1), opacity .5s, filter .5s; cursor: pointer; }
+  .stage.dragging .card { transition: none; }
+  .card .f, .card .b { position: absolute; inset: 0; border-radius: 22px; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; border: 1px solid rgba(201,154,107,.55); box-shadow: 0 30px 60px rgba(0,0,0,.55); }
+  .card .b { transform: rotateY(180deg); padding: 26px 22px; display: flex; flex-direction: column; }
+  .card.flipped { --flip: 180deg; }
+  .card .f .art { position: absolute; inset: 0 0 34% 0; }
+  .card .f .art svg { width: 38%; height: 38%; }
+  .card .f .info { position: absolute; inset: 66% 0 0 0; padding: 16px 18px; display: flex; flex-direction: column; justify-content: center; background: linear-gradient(180deg, #1d1815, #120f0d); border-top: 1px solid var(--gold); }
+  .card .nm { font-family: 'Amiri', serif; font-weight: 700; font-size: 26px; line-height: 1.15; }
+  [lang=en] .card .nm { font-family: 'Cormorant Garamond', serif; }
+  .card .en { color: var(--muted); font-family: 'Cormorant Garamond', serif; font-style: italic; }
+  .card .pr { position: absolute; top: 14px; inset-inline-end: 14px; z-index: 2; min-width: 58px; height: 58px; padding: 0 8px; border-radius: 99px; display: grid; place-items: center; background: rgba(15,13,12,.75); backdrop-filter: blur(6px); border: 1px solid var(--gold); font-family: 'Cinzel', serif; font-weight: 700; font-size: 17px; line-height: 1; text-align: center; }
+  .card .pr small { display: block; font-size: 10px; color: var(--gold); }
+  .card .num { position: absolute; top: 18px; inset-inline-start: 18px; z-index: 2; font-family: 'Cinzel', serif; color: var(--gold-hi); font-size: 12px; letter-spacing: .2em; }
+  .card .flip-hint { position: absolute; bottom: 12px; inset-inline-end: 14px; color: var(--gold); opacity: .7; }
+  .card .flip-hint svg { width: 16px; }
+  .card .badge-out { position: absolute; top: 80px; inset-inline-end: 14px; z-index: 2; }
+  .b h3 { font-family: 'Amiri', serif; font-size: 28px; }
+  .b .d { color: #d8c8bd; line-height: 1.7; margin-top: 6px; }
+  .b .lbl { margin-top: 16px; color: var(--gold); font-size: 12px; letter-spacing: .15em; }
+  .b .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed rgba(201,154,107,.35); }
+  .b .chips2 { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .b .chips2 span { border: 1px solid var(--gold); border-radius: 99px; padding: 4px 10px; font-size: 13px; color: var(--gold-hi); }
+  .b .seal { margin-top: auto; align-self: center; transform: scale(.55); margin-bottom: -26px; }
+  .card.far { opacity: 0; pointer-events: none; }
+  .card:not(.center) .f { filter: brightness(.55) saturate(.8); }
+  .card.center .f .art svg { animation: float 4s ease-in-out infinite; }
+  /* Dealing animation when switching section */
+  .card.deal { animation: deal .8s cubic-bezier(.2,.9,.2,1) both; }
+  @keyframes deal { from { opacity: 0; transform: translateY(70vh) rotate(calc(var(--k) * 9deg)) scale(.8); } }
+
+  .bar { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 22px calc(18px + env(safe-area-inset-bottom)); }
+  .bar button { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold-hi); display: grid; place-items: center; }
+  .bar .meta { text-align: center; flex: 1; }
+  .bar .count { font-family: 'Cinzel', serif; letter-spacing: .25em; color: var(--gold); font-size: 13px; }
+  .bar .track { height: 2px; margin-top: 8px; background: rgba(201,154,107,.2); border-radius: 2px; overflow: hidden; }
+  .bar .track i { display: block; height: 100%; background: var(--gold-grad); transition: width .5s; }
+  [dir=rtl] .bar .track i { margin-inline-start: 0; }
+</style>
+</head>
+<body class="marble">
+  <div class="glow" id="glow"></div>
+  <header id="head"></header>
+  <nav class="chips" id="chips"></nav>
+  <div class="stage" id="stage"></div>
+  <div class="bar">
+    <button id="prev"><i data-lucide="chevron-right"></i></button>
+    <div class="meta"><div class="count" id="count"></div><div class="track"><i id="prog"></i></div></div>
+    <button id="next"><i data-lucide="chevron-left"></i></button>
+  </div>
+<script>
+const R = RIVERA, stage = document.getElementById('stage');
+let si = 0, idx = 0, cards = [];
+const sec = () => R.sections[si];
+const side = () => (R.lang === 'ar' ? -1 : 1);
+
+function cardHTML(s, it, i) {
+  const sizes = it.sizes ? `<div class="lbl">${R.s('sizes')}</div>${it.sizes.map((z) => `<div class="row"><span>${R.lang === 'ar' ? z.ar : z.en}</span><b class="gold-text">${z.price} ₪</b></div>`).join('')}` : '';
+  const extras = it.extras ? `<div class="lbl">${R.s('flavors')}</div><div class="chips2">${it.extras.map((x) => `<span>${R.t(x)}</span>`).join('')}</div>` : '';
+  return `<div class="card ${R.isOut(it) ? 'is-out' : ''}" data-i="${i}">
+    <div class="f">
+      ${R.art(s, it, i)}
+      <span class="num">${String(i + 1).padStart(2, '0')}</span>
+      <span class="pr"><span class="gold-text">${it.sizes ? it.sizes[0].price + '+' : it.price ?? '—'}</span><small>₪</small></span>
+      ${R.isOut(it) ? `<span class="badge-out">${R.s('out')}</span>` : ''}
+      <div class="info"><div class="nm">${R.t(it)}</div><div class="en">${R.lang === 'ar' ? it.en : it.ar}</div></div>
+      <span class="flip-hint"><i data-lucide="rotate-3d"></i></span>
+    </div>
+    <div class="b marble">
+      ${R.frame()}
+      <h3 class="gold-text">${R.t(it)}</h3>
+      <div class="d">${R.desc(it) || (R.lang === 'ar' ? 'يُحضّر طازجاً عند الطلب في ريفيرا.' : 'Freshly prepared to order at Rivera.')}</div>
+      ${it.sizes ? sizes : `<div class="lbl">${R.lang === 'ar' ? 'السعر' : 'Price'}</div><div class="row"><span>${R.t(it)}</span><b class="gold-text">${R.price(it)}${it.price != null ? ' ₪' : ''}</b></div>`}
+      ${extras}
+      <div class="seal">${R.logo()}</div>
+    </div>
+  </div>`;
+}
+
+function render(deal = true) {
+  head.innerHTML = R.logo();
+  chips.innerHTML = R.sections.map((s, i) => `<button data-s="${i}" class="${i === si ? 'on' : ''}"><i data-lucide="${s.icon}"></i>${R.t(s)}</button>`).join('');
+  stage.innerHTML = sec().items.map((it, i) => cardHTML(sec(), it, i)).join('');
+  cards = [...stage.children];
+  if (deal) cards.forEach((c) => { const k = c.dataset.i - idx; c.style.setProperty('--k', k); c.style.animationDelay = Math.abs(k) * .07 + 's'; c.classList.add('deal'); c.addEventListener('animationend', () => c.classList.remove('deal'), { once: true }); });
+  glow.style.setProperty('--h', sec().hue);
+  prev.innerHTML = `<i data-lucide="chevron-${R.lang === 'ar' ? 'right' : 'left'}"></i>`;
+  next.innerHTML = `<i data-lucide="chevron-${R.lang === 'ar' ? 'left' : 'right'}"></i>`;
+  R.icons();
+  place();
+}
+
+function place(drag = 0) {
+  const w = cards[0]?.offsetWidth || 260;
+  cards.forEach((c, i) => {
+    const d = i - idx + drag;
+    const ad = Math.abs(d);
+    c.style.setProperty('--x', `${side() * d * w * .62}px`);
+    c.style.setProperty('--z', `${-ad * 140}px`);
+    c.style.setProperty('--r', `${-side() * Math.max(-1.4, Math.min(1.4, d)) * 32}deg`);
+    c.style.zIndex = 100 - Math.round(ad * 10);
+    c.classList.toggle('far', ad > 2.6);
+    c.classList.toggle('center', Math.round(ad * 10) === 0);
+    if (i !== idx) c.classList.remove('flipped');
+  });
+  const n = sec().items.length;
+  count.textContent = `${String(idx + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
+  prog.style.width = ((idx + 1) / n) * 100 + '%';
+}
+const go = (i) => { idx = Math.max(0, Math.min(cards.length - 1, i)); place(); };
+
+// Drag to scroll through the deck
+let st = null, moved = false;
+stage.addEventListener('pointerdown', (e) => { st = { x: e.clientX, y: e.clientY }; moved = false; });
+addEventListener('pointermove', (e) => {
+  if (!st) return;
+  const dx = e.clientX - st.x;
+  if (!moved && Math.abs(dx) < 8) return;
+  moved = true; stage.classList.add('dragging');
+  st.d = Math.max(-1.5, Math.min(1.5, (dx * side()) / (cards[0].offsetWidth * .62)));
+  place(st.d);
+});
+addEventListener('pointerup', () => {
+  if (!st) return;
+  stage.classList.remove('dragging');
+  if (moved) go(idx - Math.round(st.d || 0));
+  st = null;
+});
+stage.addEventListener('click', (e) => {
+  if (moved) return;
+  const c = e.target.closest('.card'); if (!c) return;
+  const i = +c.dataset.i;
+  if (i === idx) c.classList.toggle('flipped'); else go(i);
+});
+chips.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b || +b.dataset.s === si) return;
+  // Old cards fly away, then the new section is dealt in.
+  cards.forEach((c, i) => c.animate([{ transform: getComputedStyle(c).transform, opacity: 1 }, { transform: `translateY(-80vh) rotate(${(i - idx) * 12}deg)`, opacity: 0 }], { duration: 450, easing: 'cubic-bezier(.5,0,.8,.3)', fill: 'forwards', delay: Math.abs(i - idx) * 30 }));
+  setTimeout(() => { si = +b.dataset.s; idx = 0; render(); b.scrollIntoView({ inline: 'center', behavior: 'smooth' }); }, 420);
+});
+prev.onclick = () => go(idx - 1);
+next.onclick = () => go(idx + 1);
+addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') go(idx - side()); if (e.key === 'ArrowRight') go(idx + side()); });
+addEventListener('resize', () => place());
+
+R.mountLang(() => render(false));
+render();
+</script>
+</body>
+</html>

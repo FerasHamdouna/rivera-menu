@@ -1,26 +1,19 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Brand tokens for the admin panel (the public menu has its own in menu.css) */
+@theme {
+  --color-gold: #c99a6b;
+  --color-gold-lo: #8a5b38;
+  --color-gold-hi: #f0cfa6;
+  --color-cream: #f7f0ea;
+  --color-paper: #fffaf6;
+  --color-ink: #2a211c;
+  --color-marble: #171412;
+  --color-muted: #8b766a;
+  --font-admin: var(--font-tajawal), sans-serif;
+  --font-display: var(--font-amiri), serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #2a2421;
 }

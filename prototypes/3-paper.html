@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rivera · Living Paper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/brand.css">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="shared/data.js"></script>
+<script src="shared/brand.js"></script>
+<style>
+  body { background: #2a2421; perspective: 1600px; }
+  .desk { min-height: 100svh; padding: 64px 12px 40px; display: flex; justify-content: center; }
+  .sheet-paper {
+    position: relative; width: min(860px, 100%); border-radius: 6px; padding: 40px 22px 60px;
+    box-shadow: 0 2px 0 #d8c7bd, 0 30px 80px rgba(0,0,0,.55);
+    transform: rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg)); transition: transform .2s ease-out;
+    animation: lay 1.2s cubic-bezier(.2,.9,.2,1) both;
+  }
+  @keyframes lay { from { opacity: 0; transform: translateY(60px) rotateX(25deg) scale(.94); } }
+  /* Foil highlight that follows tilt */
+  .sheet-paper::after { content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: 6px; mix-blend-mode: soft-light;
+    background: radial-gradient(600px circle at var(--gx, 50%) var(--gy, 20%), rgba(255,240,220,.55), transparent 60%); }
+  .sheet-paper .frame { inset: 10px; }
+  .brandbar { text-align: center; margin-bottom: 16px; }
+  .brandbar .logo .word { color: var(--gold-lo); }
+
+  /* Controls */
+  .tools { position: sticky; top: 8px; z-index: 20; display: flex; gap: 8px; align-items: center; margin: 0 auto 22px; max-width: 520px; padding: 6px; border-radius: 99px; background: rgba(247,240,234,.85); backdrop-filter: blur(10px); box-shadow: 0 0 0 1px rgba(201,154,107,.5), 0 8px 24px rgba(60,40,30,.12); }
+  .tools .search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 0 10px; color: #8b766a; }
+  .tools input { flex: 1; border: 0; background: none; font: inherit; font-size: 15px; outline: none; color: var(--paper-ink); min-width: 0; }
+  .seg { display: flex; background: #2a2320; border-radius: 99px; padding: 3px; }
+  .seg button { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 99px; color: var(--gold-hi); font-size: 13px; }
+  .seg button svg { width: 15px; }
+  .seg button.on { background: var(--gold); color: var(--ink); }
+
+  /* List layout: two columns like the printed sheet */
+  .cols { columns: 1; column-gap: 22px; }
+  @media (min-width: 760px) { .cols { columns: 2; } }
+  .blkw { break-inside: avoid; padding-top: 18px; margin-bottom: 4px; }
+  .blk { padding: 20px 16px 10px; border-radius: 16px; border: 1.2px solid rgba(201,154,107,.65); position: relative;
+    clip-path: inset(0 0 100% 0); transition: clip-path 1.1s cubic-bezier(.6,.1,.2,1); }
+  .blk.in { clip-path: inset(-30px -10px -10px -10px); }
+  .pill { position: absolute; top: -17px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; background: #2a2320; color: var(--gold-hi); padding: 6px 18px; border-radius: 10px; font-family: 'Amiri', serif; font-size: 18px; font-weight: 700; white-space: nowrap; box-shadow: 0 0 0 1px var(--gold), 0 0 0 4px var(--cream); }
+  .pill svg { width: 17px; }
+  .row { display: flex; align-items: baseline; gap: 8px; padding: 8px 4px; border-radius: 8px; cursor: pointer; transition: background .25s, transform .25s, box-shadow .25s; }
+  .row:hover { background: rgba(201,154,107,.12); }
+  .row.lift { transform: translateY(-3px) scale(1.02); background: #fffaf6; box-shadow: 0 10px 24px rgba(60,40,30,.18); }
+  .row .nm { font-weight: 700; font-size: 17px; }
+  .row .nm small { font-weight: 400; font-size: 12px; color: #9a8579; display: block; font-family: 'Cormorant Garamond', 'Tajawal', serif; font-style: italic; }
+  .row .dots { flex: 1; border-bottom: 1.5px dotted #c2a691; min-width: 12px; }
+  .row .pr { font-family: 'Cinzel', serif; font-weight: 700; color: #8a5b38; white-space: nowrap; font-size: 16px; }
+  .row.is-out .pr { text-decoration: line-through; }
+  mark { background: linear-gradient(transparent 55%, rgba(201,154,107,.45) 55%); color: inherit; }
+
+  /* Photo grid layout */
+  .gridview { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .gridview .gsec { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; margin-top: 16px; font-family: 'Amiri', serif; font-size: 22px; font-weight: 700; color: #3a2a22; }
+  .gridview .gsec svg { width: 20px; color: var(--gold-lo); }
+  .gridview .gsec::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); }
+  [dir=rtl] .gridview .gsec::after { background: linear-gradient(-90deg, var(--gold), transparent); }
+  .tile { cursor: pointer; border-radius: 14px; overflow: hidden; background: #fffaf6; box-shadow: 0 0 0 1px rgba(201,154,107,.4), 0 6px 18px rgba(60,40,30,.1); transition: transform .3s; }
+  .tile:hover { transform: translateY(-4px); }
+  .tile .art { aspect-ratio: 1; }
+  .tile .t { padding: 8px 10px 10px; display: flex; justify-content: space-between; gap: 6px; font-weight: 700; font-size: 14px; }
+  .tile .t b { font-family: 'Cinzel', serif; color: #8a5b38; white-space: nowrap; }
+
+  .qr { display: flex; align-items: center; justify-content: space-between; margin-top: 30px; color: #b99a85; font-family: 'Cinzel', serif; letter-spacing: .25em; font-size: 11px; direction: ltr; }
+  .qr .box { width: 64px; height: 64px; border: 1px solid var(--gold); border-radius: 10px; display: grid; place-items: center; color: var(--gold-lo); }
+  .empty { text-align: center; color: #9a8579; padding: 40px 0; }
+
+  ::view-transition-group(*) { animation-duration: .6s; animation-timing-function: cubic-bezier(.3,.9,.3,1); }
+</style>
+</head>
+<body>
+  <div class="desk">
+    <article class="sheet-paper paper" id="paper">
+      <div class="frame"></div>
+      <div class="brandbar" id="brand"></div>
+      <div class="tools">
+        <label class="search"><i data-lucide="search" style="width:17px"></i><input id="q" type="search"></label>
+        <div class="seg" id="seg"><button data-v="list"><i data-lucide="scroll-text"></i><span></span></button><button data-v="grid"><i data-lucide="layout-grid"></i><span></span></button></div>
+      </div>
+      <div id="content"></div>
+      <div class="qr"><span>RIVERA · CAFE &amp; RESTAURANT</span><span class="box"><i data-lucide="qr-code"></i></span></div>
+    </article>
+  </div>
+<script>
+const R = RIVERA, content = document.getElementById('content'), q = document.getElementById('q');
+let view = 'list';
+
+const hl = (txt, term) => term ? txt.replace(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'ig'), '<mark>$1</mark>') : txt;
+const match = (it, term) => !term || [it.ar, it.en].some((s) => s.toLowerCase().includes(term.toLowerCase()));
+const vt = (sec, i) => `view-transition-name:it-${sec.id}-${i}`;
+
+function render() {
+  brand.innerHTML = R.logo();
+  document.querySelector('.frame').innerHTML = R.frame().replace(/^<div class="frame">|<\/div>$/g, '');
+  q.placeholder = R.lang === 'ar' ? 'ابحث عن صنف…' : 'Search the menu…';
+  const [l, g] = seg.querySelectorAll('span');
+  l.textContent = R.lang === 'ar' ? 'قائمة' : 'List';
+  g.textContent = R.lang === 'ar' ? 'صور' : 'Photos';
+  seg.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === view));
+
+  const term = q.value.trim();
+  const secs = R.sections.map((s) => ({ s, items: s.items.map((it, i) => [it, i]).filter(([it]) => match(it, term)) })).filter((x) => x.items.length);
+  if (!secs.length) { content.innerHTML = `<div class="empty">${R.lang === 'ar' ? 'ما في نتائج' : 'No matches'}</div>`; return R.icons(); }
+
+  if (view === 'list') {
+    content.innerHTML = `<div class="cols">${secs.map(({ s, items }) => `
+      <div class="blkw"><div class="blk" data-s="${s.id}">
+        <div class="pill"><i data-lucide="${s.icon}"></i>${R.t(s)}</div>
+        ${items.map(([it, i]) => `
+          <div class="row ${R.isOut(it) ? 'is-out' : ''}" data-s="${s.id}" data-i="${i}" style="${vt(s, i)}">
+            <span class="nm">${hl(R.t(it), term)}<small>${hl(R.lang === 'ar' ? it.en : it.ar, term)}</small></span>
+            ${R.isOut(it) ? `<span class="badge-out">${R.s('out')}</span>` : ''}
+            <span class="dots"></span>
+            <span class="pr">${R.price(it)}${it.price != null && !it.sizes ? ' ₪' : ''}</span>
+          </div>`).join('')}
+      </div></div>`).join('')}</div>`;
+  } else {
+    content.innerHTML = `<div class="gridview">${secs.map(({ s, items }) => `
+      <div class="gsec"><i data-lucide="${s.icon}"></i>${R.t(s)}</div>
+      ${items.map(([it, i]) => `
+        <div class="tile ${R.isOut(it) ? 'is-out' : ''}" data-s="${s.id}" data-i="${i}" style="${vt(s, i)}">
+          ${R.art(s, it, i)}
+          <div class="t"><span>${hl(R.t(it), term)}</span><b>${R.price(it)}</b></div>
+        </div>`).join('')}`).join('')}</div>`;
+  }
+  R.icons();
+  reveal();
+}
+
+// "Printing" each block as it scrolls into view
+function reveal() {
+  // Observe the wrapper: a fully clipped element never reports as intersecting.
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.firstElementChild.classList.add('in'); io.unobserve(e.target); } }), { threshold: .05 });
+  content.querySelectorAll('.blkw').forEach((w, i) => { w.firstElementChild.style.transitionDelay = (i % 2) * .15 + 's'; io.observe(w); });
+}
+const swap = (fn) => (document.startViewTransition ? document.startViewTransition(fn) : fn());
+
+seg.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b || b.dataset.v === view) return;
+  view = b.dataset.v;
+  swap(() => { render(); content.querySelectorAll('.blk').forEach((x) => x.classList.add('in')); });
+});
+q.addEventListener('input', () => { render(); content.querySelectorAll('.blk').forEach((x) => x.classList.add('in')); });
+content.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-i]'); if (!el) return;
+  const sec = R.sections.find((s) => s.id === el.dataset.s);
+  el.classList.add('lift');
+  setTimeout(() => { el.classList.remove('lift'); R.openSheet(sec, sec.items[el.dataset.i], +el.dataset.i); }, 220);
+});
+
+// Paper tilts with the mouse, or with the phone's gyroscope where available.
+const tilt = (x, y) => {
+  paper.style.setProperty('--ty', x * 4 + 'deg'); paper.style.setProperty('--tx', -y * 3 + 'deg');
+  paper.style.setProperty('--gx', 50 + x * 50 + '%'); paper.style.setProperty('--gy', 20 + y * 40 + '%');
+};
+addEventListener('pointermove', (e) => e.pointerType === 'mouse' && tilt(e.clientX / innerWidth - .5, e.clientY / innerHeight - .5));
+addEventListener('deviceorientation', (e) => e.gamma != null && tilt(Math.max(-1, Math.min(1, e.gamma / 30)) / 2, Math.max(-1, Math.min(1, (e.beta - 45) / 30)) / 2));
+
+R.mountLang(render);
+render();
+</script>
+</body>
+</html>
